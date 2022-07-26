@@ -1,9 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
+import Affirmation from './pages/Affirmation/Affirmation';
+import Categories from './pages/Categories/Categories';
 import LoginPage from './pages/loginPage/LoginPage';
 
-function App() {
+const App: React.FC = () => {
   return (
     <>
       {/* <AppBar /> */}
@@ -14,6 +16,6 @@ function App() {
       </Routes>
     </>
   );
-}
+};
 
 export default App;
