@@ -23,6 +23,7 @@ const Affirmation: React.FC = () => {
   return (
     <>
       <h1 style={{ marginLeft: 40}}>Affirmation Page</h1>
+      <input type="text" />
       <button style={{ marginLeft: 20}}>Add</button>
       <button style={{ marginLeft: 10}}>Delete</button>
       <List
