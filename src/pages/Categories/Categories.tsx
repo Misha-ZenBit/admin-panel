@@ -1,41 +1,56 @@
-import { Checkbox, Divider, Button, Input } from 'antd';
+import { Checkbox, Button, Input, CheckboxOptionType } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
-import React, { ChangeEvent, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Key,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { CheckBoxContainer, CheckBoxes, Page } from './styles';
+import { collection, getDocs } from 'firebase/firestore';
+import { db, categoriesRef } from '../../Firebase';
 
 const CheckboxGroup = Checkbox.Group;
 
 const Categories: React.FC = () => {
   const [checkedList, setCheckedList] = useState<CheckboxValueType[]>();
   const [curentValue, setCurentValue] = useState('');
-  const [plainOptions, setPlainOptions] = useState([
-    'Example Title 1',
-    'Example Title 2',
-    'Example Title 3',
-    'Example Title 4',
-    'Example Title 5',
-    'Example Title 6',
-    'Example Title 7',
-    'Example Title 8',
-    'Example Title 9',
-    'Example Title 10',
-    'Example Title 11',
-    'Example Title 12',
-    'Example Title 13',
-  ]);
+  const [categoriesId, setCategoriesId] = useState<any>([]);
+  const [categoriesObj, setCategoriesObj] = useState<any>([]);
+
+  useEffect(() => {
+    getCategories();
+  }, []);
+
+  useEffect(() => {
+    console.log('checked List', checkedList);
+  }, [checkedList]);
+
+  const getCategories = () => {
+    getDocs(categoriesRef).then((resposne) => {
+      const categories = resposne.docs.map((doc) => ({
+        data: doc.data(),
+        id: doc.id,
+      }));
+
+      setCategoriesObj(categories.map((e) => e.data.name));
+      setCategoriesId(categories.map((e): string => e.id));
+    });
+  };
 
   const onChange = (list: CheckboxValueType[]) => {
     setCheckedList(list);
   };
 
-  const onCategory = (e: ChangeEvent<HTMLInputElement>) => {
-    setCurentValue(e.currentTarget.value);
-  };
-
   const onAddCategory = () => {
+    if (!curentValue) {
+      return;
+    }
+
+    categoriesObj.push(curentValue);
     if (curentValue) {
-      plainOptions.push(curentValue);
       setCurentValue('');
     }
   };
@@ -46,7 +61,7 @@ const Categories: React.FC = () => {
       <Page>
         <Input
           type="text"
-          onChange={onCategory}
+          onChange={(e) => setCurentValue(e.currentTarget.value)}
           value={curentValue}
           placeholder={' New category'}
         />
@@ -62,7 +77,11 @@ const Categories: React.FC = () => {
         </Button>
       </Page>
       <CheckBoxContainer>
-        <CheckBoxes options={plainOptions} onChange={onChange} />
+        <CheckBoxes
+          key={categoriesId}
+          options={categoriesObj}
+          onChange={onChange}
+        />
       </CheckBoxContainer>
     </>
   );
