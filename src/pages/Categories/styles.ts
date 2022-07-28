@@ -5,8 +5,9 @@ import { Checkbox, Divider } from 'antd';
 const CheckboxGroup = Checkbox.Group;
 
 export const Page = styled.div`
-  /* display: inline; */
+  display: flex;
   margin-left: 10px;
+  max-width: 300px;
   /* margin-right: 50%; */
   /* justify-content: end; */
 `;

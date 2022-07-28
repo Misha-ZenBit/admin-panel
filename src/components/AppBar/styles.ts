@@ -1,8 +1,7 @@
-import styled from "styled-components";
-import { colors } from "../../constants";
+import styled from 'styled-components';
+import { colors } from '../../constants';
 
-
-export const Header = styled.header`
+export const Headers = styled.header`
   padding: 2px 24px;
   border-bottom: 1px solid grey;
   /* @media (max-width: 575px){
@@ -21,14 +20,13 @@ export const NavigationContainer = styled.nav`
     position: relative;
     padding: 2px 0;
     margin: 0 8px;
-    @media (max-width: 575px){
+    @media (max-width: 575px) {
       font-weight: 300;
       font-size: medium;
-       
+    }
   }
-}
-.navLink.active {
-    color: aqua ;
+  .navLink.active {
+    color: aqua;
   }
   .navLink:hover {
     color: blue;
