@@ -13,7 +13,7 @@ const App: React.FC = () => {
       <Layout style={{ height: '100vh' }}>
         <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
           <div className="logo" />
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['/']}>
+          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['']}>
             <Menu.Item key={'/'}>
               LOGIN
               <NavLink to="/" className="navLink"></NavLink>

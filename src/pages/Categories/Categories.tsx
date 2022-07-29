@@ -1,63 +1,179 @@
-import { Checkbox, Button, Input, CheckboxOptionType } from 'antd';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { Button, Input, notification, Modal } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
-import React, {
-  ChangeEvent,
-  Key,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
-import { CheckBoxContainer, CheckBoxes, Page } from './styles';
-import { collection, getDocs } from 'firebase/firestore';
-import { db, categoriesRef } from '../../Firebase';
+import React, { useEffect, useState } from 'react';
+import { BoxContainer, ButtonDel, Container, Page } from './styles';
+import { getDocs, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import { affirmationRef, categoriesRef, db } from '../../Firebase';
+import useSound from 'use-sound';
+import deleteSound from '../../assets/delete.mp3';
+import createSound from '../../assets/create.mp3';
 
-const CheckboxGroup = Checkbox.Group;
+interface ICat {
+  id: string;
+  name: string;
+  affirmations: string[];
+}
+interface IAff {
+  id: string;
+  answer: string;
+  description: string;
+}
 
 const Categories: React.FC = () => {
-  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>();
+  const [playCreate] = useSound(createSound, { volume: 0.2 });
+  const [playDelete] = useSound(deleteSound, { volume: 0.3 });
   const [curentValue, setCurentValue] = useState('');
-  const [categoriesId, setCategoriesId] = useState<any>([]);
-  const [categoriesObj, setCategoriesObj] = useState<any>([]);
+  const [categoriesObj, setCategoriesObj] = useState<ICat[]>();
+  const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
+  const [affirmationModal, setAffirmationModal] = useState<IAff[]>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentId, setCurrentId] = useState('');
+  const [currentName, setCurrentName] = useState('');
 
   useEffect(() => {
     getCategories();
   }, []);
 
   useEffect(() => {
-    console.log('checked List', checkedList);
-  }, [checkedList]);
+    getAffirmation();
+    console.log('affirmationsObj', affirmationsObj);
+  }, []);
 
   const getCategories = () => {
-    getDocs(categoriesRef).then((resposne) => {
-      const categories = resposne.docs.map((doc) => ({
-        data: doc.data(),
-        id: doc.id,
-      }));
+    getDocs(categoriesRef)
+      .then((resposne) => {
+        const categories = resposne.docs.map((doc) => ({
+          data: doc.data(),
+          id: doc.id,
+        }));
 
-      setCategoriesObj(categories.map((e) => e.data.name));
-      setCategoriesId(categories.map((e): string => e.id));
-    });
+        let CategoriesObj: ICat[] = [];
+        categories.map((e) => {
+          const newArray = {
+            id: e.id,
+            name: e.data.name,
+            affirmations: e.data.affirmations,
+          };
+          CategoriesObj.push(newArray);
+        });
+        setCategoriesObj(CategoriesObj);
+      })
+      .catch((error) =>
+        notification.error({ message: error.message as string })
+      );
   };
 
-  const onChange = (list: CheckboxValueType[]) => {
-    setCheckedList(list);
+  const getAffirmation = () => {
+    getDocs(affirmationRef)
+      .then((resposne) => {
+        const affirmations = resposne.docs.map((doc) => ({
+          data: doc.data(),
+          id: doc.id,
+        }));
+
+        let AffirmationsObj: IAff[] = [];
+        affirmations.map((e) => {
+          const newArray = {
+            id: e.id,
+            answer: e.data.answer,
+            description: e.data.description,
+          };
+          AffirmationsObj.push(newArray);
+        });
+        setAffirmationsObj(AffirmationsObj);
+      })
+      .catch((error) =>
+        notification.error({ message: error.message as string })
+      );
   };
 
   const onAddCategory = () => {
     if (!curentValue) {
       return;
     }
+    addDoc(categoriesRef, { name: curentValue })
+      .then((res) => console.log('res', res))
+      .catch((error) => {
+        console.log(error.message);
+      });
+    getCategories();
 
-    categoriesObj.push(curentValue);
-    if (curentValue) {
-      setCurentValue('');
+    notification.success({
+      message: `Successfully created - "${curentValue}"`,
+    });
+    setCurentValue('');
+    playCreate();
+  };
+
+  const onDeleteCategory = async (e: any) => {
+    setCurrentId(e.currentTarget.id);
+    setCurrentName(e.currentTarget.name);
+    let affirmations: string[] = [];
+    categoriesObj?.map((word) => {
+      if (word.id === e.currentTarget.id) {
+        affirmations = word.affirmations;
+      }
+    });
+    console.log('affirmations', affirmations);
+
+    if (affirmations) {
+      let affAfterFiltered = undefined;
+      let affCurrent: string[] = [];
+      affirmations.map((e) => {
+        affCurrent.push(e);
+      });
+      affAfterFiltered = affirmationsObj?.filter((aff) => {
+        return affCurrent.includes(aff.id);
+      });
+      await setAffirmationModal(affAfterFiltered);
+      setIsModalVisible(true);
     }
+
+    if (!affirmations) {
+      const docRef = doc(db, 'Categories', e.currentTarget.id);
+      deleteDoc(docRef)
+        .then(() => console.log('Docuent Deleted'))
+        .catch((error) => console.log(error.message));
+      getCategories();
+      notification.open({
+        message: '🧺 Deleted successfully ',
+        description: `${e.currentTarget.name}`,
+      });
+      await playDelete();
+    }
+  };
+
+  const onChangeCategory = (e: any) => {
+    console.log('id', e.currentTarget.id);
+    console.log('name', e.currentTarget.name);
+
+    notification.success({
+      message: 'Updated successfully ',
+      description: `${e.currentTarget.name}`,
+    });
+    playCreate();
+  };
+
+  const handleOk = async () => {
+    const docRef = doc(db, 'Categories', currentId);
+    deleteDoc(docRef)
+      .then(() => console.log('Docuent Deleted'))
+      .catch((error) => console.log(error.message));
+    getCategories();
+    notification.open({
+      message: '🧺 Deleted successfully ',
+      description: `${currentName}`,
+    });
+    await playDelete();
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
     <>
-      <h1 style={{ marginLeft: '40%' }}>Categories Page</h1>
       <Page>
         <Input
           type="text"
@@ -72,17 +188,62 @@ const Categories: React.FC = () => {
         >
           Add
         </Button>
-        <Button type="primary" style={{ marginLeft: 10 }}>
-          Delete
-        </Button>
       </Page>
-      <CheckBoxContainer>
-        <CheckBoxes
-          key={categoriesId}
-          options={categoriesObj}
-          onChange={onChange}
-        />
-      </CheckBoxContainer>
+      <BoxContainer>
+        {categoriesObj?.map((e) => (
+          <Container key={e.id}>
+            <p style={{ fontSize: 16, fontWeight: 500 }}>{e.name}</p>
+            <div style={{ display: 'flex' }}>
+              <ButtonDel
+                onClick={onChangeCategory}
+                id={e.id}
+                type="primary"
+                name={e.name}
+              >
+                ✏
+              </ButtonDel>
+              <ButtonDel
+                onClick={onDeleteCategory}
+                id={e.id}
+                type="primary"
+                name={e.name}
+                style={{ marginLeft: 10 }}
+              >
+                ❌
+              </ButtonDel>
+            </div>
+          </Container>
+        ))}
+      </BoxContainer>
+      <Modal
+        title="This category has Affirmation(s)! Do you want to delete all?"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        {affirmationModal?.map((e) => (
+          <ul key={e.id} style={{ paddingLeft: 0 }}>
+            <li
+              key={e.id}
+              style={{
+                listStyleType: 'none',
+                borderBottom: '1px solid grey',
+                marginTop: 5,
+              }}
+            >
+              <p style={{ marginBottom: 0 }}>
+                {' '}
+                <span style={{ fontWeight: '500' }}>Answer</span> - "{e.answer}"
+              </p>
+              <p style={{ marginBottom: 5 }}>
+                {' '}
+                <span style={{ fontWeight: '500' }}>Description</span> - "
+                {e.description}"
+              </p>
+            </li>
+          </ul>
+        ))}
+      </Modal>
     </>
   );
 };
