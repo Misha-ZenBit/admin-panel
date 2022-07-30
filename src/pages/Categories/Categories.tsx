@@ -34,8 +34,6 @@ const Categories: React.FC = () => {
   const [currentChangeInput, setCurrentChangeInput] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  console.log('Test');
-
   useEffect(() => {
     getCategories();
   }, []);
