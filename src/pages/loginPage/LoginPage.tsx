@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 import 'antd/dist/antd.min.css';
 import React from 'react';
 import { StyledForm } from './styles';

@@ -52,7 +52,7 @@ const Categories: React.FC = () => {
         }));
 
         let CategoriesObj: ICat[] = [];
-        categories.map((e) => {
+        categories.forEach((e) => {
           const newArray = {
             id: e.id,
             name: e.data.name,
@@ -76,7 +76,7 @@ const Categories: React.FC = () => {
         }));
 
         let AffirmationsObj: IAff[] = [];
-        affirmations.map((e) => {
+        affirmations.forEach((e) => {
           const newArray = {
             id: e.id,
             answer: e.data.answer,
@@ -113,7 +113,7 @@ const Categories: React.FC = () => {
     setCurrentId(e.currentTarget.id);
     setCurrentName(e.currentTarget.name);
     let affirmations: string[] = [];
-    categoriesObj?.map((word) => {
+    categoriesObj?.forEach((word) => {
       if (word.id === e.currentTarget.id) {
         affirmations = word.affirmations;
       }
@@ -123,7 +123,7 @@ const Categories: React.FC = () => {
     if (affirmations) {
       let affAfterFiltered = undefined;
       let affCurrent: string[] = [];
-      affirmations.map((e) => {
+      affirmations.forEach((e) => {
         affCurrent.push(e);
       });
       affAfterFiltered = affirmationsObj?.filter((aff) => {
