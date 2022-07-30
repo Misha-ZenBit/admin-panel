@@ -13,6 +13,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <>
+      <h1>Aybek</h1>
       <StyledForm
         name="basic"
         labelCol={{ span: 8 }}
