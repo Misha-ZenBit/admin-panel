@@ -10,11 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - run: npm i
-      - run: npm run build
+
+      - name: Install Dependencies
+        run: npm i
+
+      - name: run build
+        run: npm run build
+
       - uses: jakejarvis/s3-sync-action@master
         with:
-          args: --acl public-read --follow-symlinks --delete --exclude '.git*/*'
+          args: public-read --follow-symlinks --delete --exclude '.git*/*'
         env:
           CI: false
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
