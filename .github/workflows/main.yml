@@ -11,8 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - name: Install Dependencies
+      - name: Install Dependencies 🔰
         run: npm i
+
+      - name: Run Build 🛠
+        run: npm run build
+        env:
+          CI: false
 
       - uses: jakejarvis/s3-sync-action@master
         with:
