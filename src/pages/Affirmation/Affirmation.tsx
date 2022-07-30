@@ -1,14 +1,11 @@
-import { Avatar, List, Checkbox, Divider } from 'antd';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { Avatar, List, Checkbox } from 'antd';
+// import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import React, { useState } from 'react';
 
 const CheckboxGroup = Checkbox.Group;
 
 const plainOptions = ['Apple', 'Pear', 'Orange'];
-const plainOptions1 = ['Apple1', 'Pear1', 'Orange1'];
-const plainOptions2 = ['Apple2', 'Pear2', 'Orange2'];
-const plainOptions3 = ['Apple3', 'Pear4', 'Orange5'];
 
 const data = [
   {
@@ -31,20 +28,20 @@ const data = [
 
 const Affirmation: React.FC = () => {
   const [checkedList, setCheckedList] = useState<CheckboxValueType[]>();
-  const [indeterminate, setIndeterminate] = useState(true);
-  const [checkAll, setCheckAll] = useState(false);
+  // const [indeterminate, setIndeterminate] = useState(true);
+  // const [checkAll, setCheckAll] = useState(false);
 
   const onChange = (list: CheckboxValueType[]) => {
     setCheckedList(list);
-    setIndeterminate(!!list.length && list.length < plainOptions.length);
-    setCheckAll(list.length === plainOptions.length);
+    // setIndeterminate(!!list.length && list.length < plainOptions.length);
+    // setCheckAll(list.length === plainOptions.length);
   };
 
-  const onCheckAllChange = (e: CheckboxChangeEvent) => {
-    setCheckedList(e.target.checked ? plainOptions : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
-  };
+  // const onCheckAllChange = (e: CheckboxChangeEvent) => {
+  //   setCheckedList(e.target.checked ? plainOptions : []);
+  //   setIndeterminate(false);
+  //   setCheckAll(e.target.checked);
+  // };
 
   return (
     <>

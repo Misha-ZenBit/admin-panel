@@ -1,8 +1,6 @@
-import { Button, Form } from 'antd';
+import { Button } from 'antd';
 import styled from 'styled-components';
-import { colors } from '../../constants';
-import { Checkbox, Divider } from 'antd';
-const CheckboxGroup = Checkbox.Group;
+import { Checkbox } from 'antd';
 
 export const Page = styled.div`
   display: flex;

@@ -4,7 +4,7 @@ import './App.css';
 import Affirmation from './pages/Affirmation/Affirmation';
 import Categories from './pages/Categories/Categories';
 import LoginPage from './pages/loginPage/LoginPage';
-import { Breadcrumb, Layout, Menu } from 'antd';
+import { Layout, Menu } from 'antd';
 const { Header, Content, Footer } = Layout;
 
 const App: React.FC = () => {
