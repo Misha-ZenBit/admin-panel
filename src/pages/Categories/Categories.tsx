@@ -1,8 +1,7 @@
 import { Button, Input, notification, Modal } from 'antd';
-import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import React, { useEffect, useState } from 'react';
 import { BoxContainer, ButtonDel, Container, Page } from './styles';
-import { getDocs, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import { getDocs, doc, addDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { affirmationRef, categoriesRef, db } from '../../Firebase';
 import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
@@ -20,23 +19,28 @@ interface IAff {
 }
 
 const Categories: React.FC = () => {
-  const [playCreate] = useSound(createSound, { volume: 0.2 });
-  const [playDelete] = useSound(deleteSound, { volume: 0.3 });
+  const [playCreate] = useSound(createSound, { volume: 0.1 });
+  const [playDelete] = useSound(deleteSound, { volume: 0.15 });
   const [curentValue, setCurentValue] = useState('');
   const [categoriesObj, setCategoriesObj] = useState<ICat[]>();
   const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
   const [affirmationModal, setAffirmationModal] = useState<IAff[]>();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isChangeModalVisible, setIsChangeModalVisible] = useState(false);
   const [currentId, setCurrentId] = useState('');
   const [currentName, setCurrentName] = useState('');
+  const [currentChengeId, setCurrentChengeId] = useState('');
+  const [currentChangeName, setCurrentChangeName] = useState('');
+  const [currentChangeInput, setCurrentChangeInput] = useState('');
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
     getCategories();
   }, []);
+  console.log('Test', currentChangeInput);
 
   useEffect(() => {
     getAffirmation();
-    console.log('affirmationsObj', affirmationsObj);
   }, []);
 
   const getCategories = () => {
@@ -144,20 +148,16 @@ const Categories: React.FC = () => {
   };
 
   const onChangeCategory = (e: any) => {
-    console.log('id', e.currentTarget.id);
-    console.log('name', e.currentTarget.name);
+    setCurrentChengeId(e.currentTarget.id);
+    setCurrentChangeName(e.currentTarget.name);
 
-    notification.success({
-      message: 'Updated successfully ',
-      description: `${e.currentTarget.name}`,
-    });
-    playCreate();
+    setIsChangeModalVisible(true);
   };
 
   const handleOk = async () => {
     const docRef = doc(db, 'Categories', currentId);
     deleteDoc(docRef)
-      .then(() => console.log('Docuent Deleted'))
+      .then(() => console.log('Document Deleted'))
       .catch((error) => console.log(error.message));
     getCategories();
     notification.open({
@@ -167,7 +167,24 @@ const Categories: React.FC = () => {
     await playDelete();
     setIsModalVisible(false);
   };
+  const handleChangeOk = async () => {
+    await setConfirmLoading(true);
+    const docRef = doc(db, 'Categories', currentChengeId);
+    await updateDoc(docRef, { name: currentChangeInput })
+      .then(() => console.log('Docuent Updated'))
+      .catch((error) => console.log(error.message));
+    await getCategories();
+    notification.success({
+      message: 'Updated successfully ',
+    });
+    await setConfirmLoading(false);
+    await playCreate();
+    await setIsChangeModalVisible(false);
+  };
 
+  const handleChangeCancel = () => {
+    setIsChangeModalVisible(false);
+  };
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -193,7 +210,7 @@ const Categories: React.FC = () => {
         {categoriesObj?.map((e) => (
           <Container key={e.id}>
             <p style={{ fontSize: 16, fontWeight: 500 }}>{e.name}</p>
-            <div style={{ display: 'flex' }}>
+            <li key={e.id} style={{ display: 'flex' }}>
               <ButtonDel
                 onClick={onChangeCategory}
                 id={e.id}
@@ -211,10 +228,25 @@ const Categories: React.FC = () => {
               >
                 ❌
               </ButtonDel>
-            </div>
+            </li>
           </Container>
         ))}
       </BoxContainer>
+      <Modal
+        title="Сategory name change"
+        visible={isChangeModalVisible}
+        onOk={handleChangeOk}
+        onCancel={handleChangeCancel}
+        confirmLoading={confirmLoading}
+        centered
+      >
+        <Input
+          type="text"
+          onChange={(e) => setCurrentChangeInput(e.currentTarget.value)}
+          defaultValue={currentChangeName}
+        />
+      </Modal>
+
       <Modal
         title="This category has Affirmation(s)! Do you want to delete all?"
         visible={isModalVisible}
