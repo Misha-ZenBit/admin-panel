@@ -11,10 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - run: npm i
-      - uses: npm run build
-          with:
-            args: --acl public-read --follow-symlinks --delete
-        # - uses: jakejarvis/s3-sync-action@master
+      - run: npm run build
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
