@@ -14,9 +14,6 @@ jobs:
       - name: Install Dependencies
         run: npm i
 
-      - name: run build
-        run: npm run build
-
       - uses: jakejarvis/s3-sync-action@master
         with:
           args: public-read --follow-symlinks --delete --exclude '.git*/*'
