@@ -8,10 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: build
+      run: npm i
+      run: npm run build
     steps:
       - uses: actions/checkout@master
-      - run: npm i
-      - run: npm run build
       - uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
