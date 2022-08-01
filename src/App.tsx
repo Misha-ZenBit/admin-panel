@@ -1,25 +1,29 @@
 import React from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import './App.css';
+import { useLocation } from 'react-router-dom';
 import Affirmation from './pages/Affirmation/Affirmation';
 import Categories from './pages/Categories/Categories';
 import LoginPage from './pages/loginPage/LoginPage';
 import { Layout, Menu } from 'antd';
 const { Header, Content, Footer } = Layout;
 
+
 const App: React.FC = () => {
+  const location = useLocation()
+  
   return (
     <>
       <Layout style={{ height: '100vh' }}>
         <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
           <div className="logo" />
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['']}>
+          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[`${location.pathname}`]}>
             <Menu.Item key={'/'}>
               LOGIN
               <NavLink to="/" className="navLink"></NavLink>
             </Menu.Item>
             <Menu.Item key={'/categories'}>
-              CATIGORIES
+              CATEGORIES
               <NavLink to="/categories" className="navLink"></NavLink>
             </Menu.Item>
             <Menu.Item key={'/affirmation'}>

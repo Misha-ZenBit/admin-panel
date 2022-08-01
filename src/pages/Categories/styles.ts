@@ -42,7 +42,9 @@ export const ButtonDel = styled(Button)`
     border: 1px solid blue;
   }
   :focus {
-    border: 1px solid blue;
+    border: none;
     color: black;
+    background: none;
+
   }
 `;

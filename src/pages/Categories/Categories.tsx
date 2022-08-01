@@ -7,12 +7,12 @@ import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
 
-interface ICat {
+export interface ICat {
   id: string;
   name: string;
   affirmations: string[];
 }
-interface IAff {
+export interface IAff {
   id: string;
   answer: string;
   description: string;
@@ -23,6 +23,7 @@ const Categories: React.FC = () => {
   const [playDelete] = useSound(deleteSound, { volume: 0.15 });
   const [curentValue, setCurentValue] = useState('');
   const [categoriesObj, setCategoriesObj] = useState<ICat[]>();
+  const [nameCategory, setNameCategory] = useState(['']);
   const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
   const [affirmationModal, setAffirmationModal] = useState<IAff[]>();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -30,14 +31,13 @@ const Categories: React.FC = () => {
   const [currentId, setCurrentId] = useState('');
   const [currentName, setCurrentName] = useState('');
   const [currentChengeId, setCurrentChengeId] = useState('');
-  const [currentChangeName, setCurrentChangeName] = useState('');
   const [currentChangeInput, setCurrentChangeInput] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
     getCategories();
   }, []);
-  console.log('Test', currentChangeInput);
+  console.log('currentChangeInput', currentChangeInput);
 
   useEffect(() => {
     getAffirmation();
@@ -52,12 +52,15 @@ const Categories: React.FC = () => {
         }));
 
         let CategoriesObj: ICat[] = [];
+        let nameOfCat: string[] = [];
         categories.forEach((e) => {
           const newArray = {
             id: e.id,
             name: e.data.name,
             affirmations: e.data.affirmations,
           };
+          nameOfCat.push(e.data.name);
+          setNameCategory(nameOfCat);
           CategoriesObj.push(newArray);
         });
         setCategoriesObj(CategoriesObj);
@@ -91,16 +94,22 @@ const Categories: React.FC = () => {
       );
   };
 
-  const onAddCategory = () => {
+  const onAddCategory = async () => {
     if (!curentValue) {
       return;
     }
-    addDoc(categoriesRef, { name: curentValue })
+
+    if (nameCategory.includes(curentValue)) {
+      return notification.error({
+        message: `"${curentValue}" - this category already exists`,
+      });
+    }
+    await addDoc(categoriesRef, { name: curentValue })
       .then((res) => console.log('res', res))
       .catch((error) => {
         console.log(error.message);
       });
-    getCategories();
+    await getCategories();
 
     notification.success({
       message: `Successfully created - "${curentValue}"`,
@@ -118,7 +127,6 @@ const Categories: React.FC = () => {
         affirmations = word.affirmations;
       }
     });
-    console.log('affirmations', affirmations);
 
     if (affirmations) {
       let affAfterFiltered = undefined;
@@ -147,10 +155,9 @@ const Categories: React.FC = () => {
     }
   };
 
-  const onChangeCategory = (e: any) => {
+  const onChangeCategory = async (e: any) => {
     setCurrentChengeId(e.currentTarget.id);
-    setCurrentChangeName(e.currentTarget.name);
-
+    setCurrentChangeInput(e.currentTarget.name);
     setIsChangeModalVisible(true);
   };
 
@@ -243,7 +250,7 @@ const Categories: React.FC = () => {
         <Input
           type="text"
           onChange={(e) => setCurrentChangeInput(e.currentTarget.value)}
-          defaultValue={currentChangeName}
+          value={currentChangeInput}
         />
       </Modal>
 
