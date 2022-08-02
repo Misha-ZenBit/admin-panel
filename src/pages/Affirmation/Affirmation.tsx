@@ -32,7 +32,7 @@ const Affirmation: React.FC = () => {
   useEffect(() => {
     getCategories();
     getAffirmation();
-  }, [keyCategory]);
+  }, [keyCategory, nameCategory]);
 
   const getCategories = async () => {
     await getDocs(categoriesRef)
@@ -42,18 +42,34 @@ const Affirmation: React.FC = () => {
           id: doc.id,
         }));
 
-        let CategoriesObj: ICat[] = [];
-        await categories.forEach((e) => {
+        let categoriesObj: ICat[] = [];
+        categories.forEach((e) => {
           const newArray = {
             id: e.id,
             name: e.data.name,
             affirmations: e.data.affirmations,
           };
 
-          CategoriesObj.push(newArray);
+          categoriesObj.push(newArray);
         });
-        console.log('CategoriesObj', CategoriesObj);
-        await setCategoriesObj(CategoriesObj);
+
+        const affAfterFiltered = categoriesObj?.filter((aff) => {
+          return aff.name === nameCategory;
+        });
+
+        let AffirmationsId: string[] = [];
+        affAfterFiltered?.map((e) =>
+          AffirmationsId.push(...(e.affirmations || ''))
+        );
+
+        setAffirmationsId(AffirmationsId);
+        const Affirmatoins = affirmationsObj?.filter((aff) => {
+          return AffirmationsId.includes(aff.id);
+        });
+
+        setFilteredAffObj(Affirmatoins);
+
+        setCategoriesObj(categoriesObj);
       })
       .catch((error) =>
         notification.error({ message: error.message as string })
@@ -141,24 +157,10 @@ const Affirmation: React.FC = () => {
     setVisible(false);
   };
 
-  const handleChange = async (value: string, e: any) => {
-    await setKeyCategory(e.key);
-    await setNameCategory(value);
-
-    const affAfterFiltered = await categoriesObj?.filter((aff) => {
-      return aff.name === value;
-    });
-
-    let AffirmationsId: string[] = [];
-    await affAfterFiltered?.map((e) =>
-      AffirmationsId.push(...(e.affirmations || ''))
-    );
-    setAffirmationsId(AffirmationsId);
-
-    const Affirmatoins = affirmationsObj?.filter((aff) => {
-      return AffirmationsId.includes(aff.id);
-    });
-    await setFilteredAffObj(Affirmatoins);
+  const fetchSelectedAffirmations = async (nameCategory: string, e: any) => {
+    setKeyCategory(e.key);
+    setNameCategory(nameCategory);
+    await getCategories();
   };
 
   const handleChangeAffirmation = async (value: string, e: any) => {
@@ -167,7 +169,6 @@ const Affirmation: React.FC = () => {
 
   const onUpdateAffirmation = async () => {
     setVisibleBtnBottom(true);
-
     const docRef = doc(db, 'Categories', keyCategory);
     await setDoc(docRef, {
       affirmations: [...affirmationsId, selectedKey],
@@ -177,14 +178,24 @@ const Affirmation: React.FC = () => {
       .catch((error) => {
         console.log(error.message);
       });
-    await getCategories();
-    await getAffirmation();
-    console.log('1', nameCategory, keyCategory);
-
-    await handleChange(nameCategory, { key: keyCategory });
-
+    await fetchSelectedAffirmations(nameCategory, { key: keyCategory });
     setVisibleBtnBottom(false);
   };
+
+  const renderAffirmations = (affirmations: IAff[] | undefined) => {
+    return affirmations?.map((e) => (
+      <Option
+        key={e.id}
+        style={{
+          textAlign: 'center',
+        }}
+        value={e.answer}
+      >
+        {e.answer}
+      </Option>
+    ));
+  };
+
   return (
     <>
       <BoxContainer
@@ -273,7 +284,7 @@ const Affirmation: React.FC = () => {
               textAlign: 'center',
               fontSize: '20px',
             }}
-            onChange={handleChange}
+            onChange={fetchSelectedAffirmations}
           >
             {categoriesObj?.map((e) => (
               <Option
@@ -334,17 +345,7 @@ const Affirmation: React.FC = () => {
             }}
             onChange={handleChangeAffirmation}
           >
-            {affirmationsObj?.map((e) => (
-              <Option
-                key={e.id}
-                style={{
-                  textAlign: 'center',
-                }}
-                value={e.answer}
-              >
-                {e.answer}
-              </Option>
-            ))}
+            {renderAffirmations(affirmationsObj)}
           </Select>
           <Button
             onClick={onUpdateAffirmation}
