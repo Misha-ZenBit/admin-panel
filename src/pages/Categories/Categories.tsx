@@ -113,7 +113,7 @@ const Categories: React.FC = () => {
         affirmations = word.affirmations;
       }
     });
-    if (!affirmations) {
+    if (!affirmations.length) {
       const docRef = doc(db, 'Categories', e.currentTarget.id);
       await deleteDoc(docRef)
         .then(() => console.log('Docuent Deleted'))
@@ -125,7 +125,7 @@ const Categories: React.FC = () => {
       playDelete();
     }
 
-    if (affirmations) {
+    if (affirmations.length) {
       console.log('da');
       let affAfterFiltered = undefined;
       let affCurrent: string[] = [];

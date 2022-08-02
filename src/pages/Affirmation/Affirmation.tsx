@@ -368,9 +368,10 @@ const Affirmation: React.FC = () => {
           <Select
             defaultValue="Choose affirmation..."
             style={{
-              width: '25%',
+              width: '30%',
               textAlign: 'center',
               fontSize: '16px',
+              marginLeft: 40,
             }}
             onChange={handleChangeAffirmation}
           >
