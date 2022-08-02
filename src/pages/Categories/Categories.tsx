@@ -37,7 +37,6 @@ const Categories: React.FC = () => {
   useEffect(() => {
     getCategories();
   }, []);
-  console.log('currentChangeInput', currentChangeInput);
 
   useEffect(() => {
     getAffirmation();
@@ -143,15 +142,15 @@ const Categories: React.FC = () => {
 
     if (!affirmations) {
       const docRef = doc(db, 'Categories', e.currentTarget.id);
-      deleteDoc(docRef)
+      await deleteDoc(docRef)
         .then(() => console.log('Docuent Deleted'))
         .catch((error) => console.log(error.message));
-      getCategories();
+      await getCategories();
       notification.open({
         message: '🧺 Deleted successfully ',
         description: `${e.currentTarget.name}`,
       });
-      await playDelete();
+      playDelete();
     }
   };
 

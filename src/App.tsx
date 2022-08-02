@@ -8,16 +8,19 @@ import LoginPage from './pages/loginPage/LoginPage';
 import { Layout, Menu } from 'antd';
 const { Header, Content, Footer } = Layout;
 
-
 const App: React.FC = () => {
-  const location = useLocation()
-  
+  const location = useLocation();
+
   return (
     <>
-      <Layout style={{ height: '100vh' }}>
+      <Layout style={{ minHeight: '100vh' }}>
         <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
           <div className="logo" />
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[`${location.pathname}`]}>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={[`${location.pathname}`]}
+          >
             <Menu.Item key={'/'}>
               LOGIN
               <NavLink to="/" className="navLink"></NavLink>
@@ -47,7 +50,12 @@ const App: React.FC = () => {
             </Routes>
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>
+        <Footer
+          style={{
+            textAlign: 'center',
+            position: 'relative',
+          }}
+        >
           Design ©2022 Created by ZenBit
         </Footer>
       </Layout>

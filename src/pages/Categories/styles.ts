@@ -4,17 +4,16 @@ import { Checkbox } from 'antd';
 
 export const Page = styled.div`
   display: flex;
-  margin-left: 10px;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 300px;
   /* margin-right: 50%; */
-  /* justify-content: end; */
 `;
 export const CheckBoxes = styled(Checkbox.Group)`
   display: inline-grid;
 `;
 export const BoxContainer = styled.div`
   margin-top: 30px;
-  height: 75vh;
   overflow-y: auto;
   border: 1px solid rgb(169, 174, 192);
   border-radius: 6px 6px 6px 6px;
@@ -28,6 +27,7 @@ export const Container = styled.div`
   border-bottom: 1px solid white;
   margin-bottom: 10px;
 `;
+
 export const ButtonDel = styled(Button)`
   display: flex;
   background: none;
@@ -45,6 +45,5 @@ export const ButtonDel = styled(Button)`
     border: none;
     color: black;
     background: none;
-
   }
 `;
