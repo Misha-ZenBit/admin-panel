@@ -2,40 +2,34 @@ import { notification, Input, Button, Modal, Select } from 'antd';
 import { getDocs, doc, addDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { affirmationRef, categoriesRef, db } from '../../Firebase';
-import { IAff, ICat } from '../Categories/Categories';
 import { ButtonDel, Container, Page } from '../Categories/styles';
-import {
-  BoxContainer,
-  Div,
-  EmptyComponent,
-  Li,
-  LiMain,
-  P,
-  Title,
-  Vertical,
-} from './styles';
+import { Box, Div, Empty, Li, LiMain, P, Title, Vertical } from './styles';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
 import useSound from 'use-sound';
+import { IAff, ICat } from '../../types/types';
 const { Option } = Select;
 const Affirmation: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
   const [playDelete] = useSound(deleteSound, { volume: 0.15 });
+
   const [categoriesObj, setCategoriesObj] = useState<ICat[]>();
   const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
-  const [filteredAffObj, setFilteredAffObj] = useState<IAff[]>();
-  const [answerValue, setAnswerValue] = useState('');
+  const [filteredAffirmation, setFilteredAffObj] = useState<IAff[]>();
+  const [affirmationsId, setAffirmationsId] = useState(['']);
+  const [currentId, setCurrentId] = useState('');
+  const [currentAnswer, setCurrentAnswer] = useState('');
   const [descriptionValue, setDescriptionValue] = useState('');
+  const [answerValue, setAnswerValue] = useState('');
+  const [currentDescription, setCurrentDescription] = useState('');
+
   const [visible, setVisible] = useState(false);
   const [visibleBtn, setVisibleBtn] = useState(false);
   const [visibleBtnBottom, setVisibleBtnBottom] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [currentId, setCurrentId] = useState('');
-  const [currentAnswer, setCurrentAnswer] = useState('');
-  const [currentDescription, setCurrentDescription] = useState('');
+
   const [keyCategory, setKeyCategory] = useState('');
   const [nameCategory, setNameCategory] = useState('');
-  const [affirmationsId, setAffirmationsId] = useState(['']);
   const [selectedKey, setSelectedKey] = useState('');
 
   useEffect(() => {
@@ -144,7 +138,7 @@ const Affirmation: React.FC = () => {
     setCurrentAnswer(e.currentTarget.name);
   };
 
-  const handleOk = async () => {
+  const onDeleteAffirmationModal = async () => {
     setConfirmLoading(true);
 
     const docRef = doc(db, 'Affirmation', currentId);
@@ -153,16 +147,12 @@ const Affirmation: React.FC = () => {
       .catch((error) => console.log(error.message));
 
     await getAffirmation();
-    notification.open({
+    notification.success({
       message: '🧺 Deleted successfully ',
     });
     playDelete();
 
     await setConfirmLoading(false);
-    setVisible(false);
-  };
-
-  const handleCancel = () => {
     setVisible(false);
   };
 
@@ -178,6 +168,7 @@ const Affirmation: React.FC = () => {
 
   const onUpdateAffirmation = async () => {
     setVisibleBtnBottom(true);
+
     const docRef = doc(db, 'Categories', keyCategory);
     await setDoc(docRef, {
       affirmations: [...affirmationsId, selectedKey],
@@ -189,6 +180,30 @@ const Affirmation: React.FC = () => {
       });
     await fetchSelectedAffirmations(nameCategory, { key: keyCategory });
     setVisibleBtnBottom(false);
+    notification.success({
+      message: `Successful update `,
+      description: `Category "${nameCategory}"`,
+    });
+    playCreate();
+  };
+
+  const onSeparateAffirmation = async (e: any) => {
+    const id = e.currentTarget.id;
+    const affirmationArrayAfterDelete = affirmationsId.filter((e) => e !== id);
+    const docRef = doc(db, 'Categories', keyCategory);
+    await setDoc(docRef, {
+      affirmations: [...affirmationArrayAfterDelete],
+      name: nameCategory,
+    })
+      .then((res) => console.log('res', res))
+      .catch((error) => {
+        console.log(error.message);
+      });
+    getCategories();
+    notification.success({
+      message: `🧺 Deleted successfully`,
+    });
+    playDelete();
   };
 
   const renderAffirmations = (affirmations: IAff[] | undefined) => {
@@ -207,7 +222,7 @@ const Affirmation: React.FC = () => {
 
   return (
     <>
-      <BoxContainer
+      <Box
         style={{
           height: '0%',
           paddingTop: 18,
@@ -281,8 +296,8 @@ const Affirmation: React.FC = () => {
             </li>
           </Container>
         ))}
-      </BoxContainer>
-      <BoxContainer style={{ height: '0%', paddingTop: 18, paddingBottom: 15 }}>
+      </Box>
+      <Box style={{ height: '0%', paddingTop: 18, paddingBottom: 15 }}>
         <LiMain>
           <Select
             defaultValue="Choose category..."
@@ -308,12 +323,12 @@ const Affirmation: React.FC = () => {
             ))}
           </Select>
         </LiMain>
-        {!filteredAffObj?.length && (
+        {!filteredAffirmation?.length && (
           <Container style={{ borderBottom: 'none' }}>
-            <EmptyComponent>Empty list</EmptyComponent>
+            <Empty>Empty list</Empty>
           </Container>
         )}
-        {filteredAffObj?.map((affirmation) => (
+        {filteredAffirmation?.map((affirmation) => (
           <Container key={affirmation.id} style={{ borderBottom: 'none' }}>
             <Li>
               <Div>
@@ -333,11 +348,10 @@ const Affirmation: React.FC = () => {
               style={{ display: 'flex', alignItems: 'center' }}
             >
               <ButtonDel
-                // onClick={onDeleteCategory}
                 id={affirmation.id}
                 type="primary"
                 name={affirmation.answer}
-                target={affirmation.description}
+                onClick={onSeparateAffirmation}
                 style={{ marginLeft: 10, marginBottom: 0 }}
               >
                 ❌
@@ -371,12 +385,12 @@ const Affirmation: React.FC = () => {
             Add
           </Button>
         </LiMain>
-      </BoxContainer>
+      </Box>
       <Modal
         title="Are you sure you want to delete?"
         visible={visible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        onOk={onDeleteAffirmationModal}
+        onCancel={(): void => setVisible(false)}
         confirmLoading={confirmLoading}
         centered
       >

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const BoxContainer = styled.div`
+export const Box = styled.div`
   margin-top: 30px;
   overflow-y: auto;
   border: 1px solid rgb(169, 174, 192);
@@ -45,7 +45,7 @@ export const Vertical = styled.div`
 export const P = styled.p`
   margin: 0;
 `;
-export const EmptyComponent = styled.p`
+export const Empty = styled.p`
   position: relative;
   font-size: 20px;
   font-weight: 500;

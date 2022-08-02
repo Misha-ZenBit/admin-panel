@@ -6,17 +6,7 @@ import { affirmationRef, categoriesRef, db } from '../../Firebase';
 import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
-
-export interface ICat {
-  id: string;
-  name: string;
-  affirmations: string[];
-}
-export interface IAff {
-  id: string;
-  answer: string;
-  description: string;
-}
+import { IAff, ICat } from '../../types/types';
 
 const Categories: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
@@ -36,14 +26,11 @@ const Categories: React.FC = () => {
 
   useEffect(() => {
     getCategories();
-  }, []);
-
-  useEffect(() => {
     getAffirmation();
-  }, []);
+  }, [currentName, currentId]);
 
-  const getCategories = () => {
-    getDocs(categoriesRef)
+  const getCategories = async () => {
+    await getDocs(categoriesRef)
       .then((resposne) => {
         const categories = resposne.docs.map((doc) => ({
           data: doc.data(),
@@ -126,8 +113,20 @@ const Categories: React.FC = () => {
         affirmations = word.affirmations;
       }
     });
+    if (!affirmations) {
+      const docRef = doc(db, 'Categories', e.currentTarget.id);
+      await deleteDoc(docRef)
+        .then(() => console.log('Docuent Deleted'))
+        .catch((error) => console.log(error.message));
+      await getCategories();
+      notification.success({
+        message: '🧺 Deleted successfully ',
+      });
+      playDelete();
+    }
 
     if (affirmations) {
+      console.log('da');
       let affAfterFiltered = undefined;
       let affCurrent: string[] = [];
       affirmations.forEach((e) => {
@@ -138,19 +137,6 @@ const Categories: React.FC = () => {
       });
       await setAffirmationModal(affAfterFiltered);
       setIsModalVisible(true);
-    }
-
-    if (!affirmations) {
-      const docRef = doc(db, 'Categories', e.currentTarget.id);
-      await deleteDoc(docRef)
-        .then(() => console.log('Docuent Deleted'))
-        .catch((error) => console.log(error.message));
-      await getCategories();
-      notification.open({
-        message: '🧺 Deleted successfully ',
-        description: `${e.currentTarget.name}`,
-      });
-      playDelete();
     }
   };
 
@@ -173,6 +159,7 @@ const Categories: React.FC = () => {
     await playDelete();
     setIsModalVisible(false);
   };
+
   const handleChangeOk = async () => {
     await setConfirmLoading(true);
     const docRef = doc(db, 'Categories', currentChengeId);
