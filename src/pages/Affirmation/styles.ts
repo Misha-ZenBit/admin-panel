@@ -45,3 +45,13 @@ export const Vertical = styled.div`
 export const P = styled.p`
   margin: 0;
 `;
+export const EmptyComponent = styled.p`
+  position: relative;
+  font-size: 20px;
+  font-weight: 500;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 8px;
+  padding-right: 80px;
+  color: lightgrey;
+`;

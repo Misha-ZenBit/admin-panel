@@ -4,7 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { affirmationRef, categoriesRef, db } from '../../Firebase';
 import { IAff, ICat } from '../Categories/Categories';
 import { ButtonDel, Container, Page } from '../Categories/styles';
-import { BoxContainer, Div, Li, LiMain, P, Title, Vertical } from './styles';
+import {
+  BoxContainer,
+  Div,
+  EmptyComponent,
+  Li,
+  LiMain,
+  P,
+  Title,
+  Vertical,
+} from './styles';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
 import useSound from 'use-sound';
@@ -299,6 +308,11 @@ const Affirmation: React.FC = () => {
             ))}
           </Select>
         </LiMain>
+        {!filteredAffObj?.length && (
+          <Container style={{ borderBottom: 'none' }}>
+            <EmptyComponent>Empty list</EmptyComponent>
+          </Container>
+        )}
         {filteredAffObj?.map((affirmation) => (
           <Container key={affirmation.id} style={{ borderBottom: 'none' }}>
             <Li>
@@ -331,6 +345,7 @@ const Affirmation: React.FC = () => {
             </li>
           </Container>
         ))}
+
         <LiMain
           style={{
             justifyContent: 'center',
@@ -339,9 +354,9 @@ const Affirmation: React.FC = () => {
           <Select
             defaultValue="Choose affirmation..."
             style={{
-              width: '20%',
+              width: '25%',
               textAlign: 'center',
-              fontSize: '20px',
+              fontSize: '16px',
             }}
             onChange={handleChangeAffirmation}
           >
