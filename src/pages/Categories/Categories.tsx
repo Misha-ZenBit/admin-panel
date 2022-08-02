@@ -108,11 +108,14 @@ const Categories: React.FC = () => {
     setCurrentId(e.currentTarget.id);
     setCurrentName(e.currentTarget.name);
     let affirmations: string[] = [];
+    console.log('Test', categoriesObj);
+
     categoriesObj?.forEach((word) => {
       if (word.id === e.currentTarget.id) {
         affirmations = word.affirmations;
       }
     });
+
     if (!affirmations.length) {
       const docRef = doc(db, 'Categories', e.currentTarget.id);
       await deleteDoc(docRef)
@@ -122,11 +125,10 @@ const Categories: React.FC = () => {
       notification.success({
         message: '🧺 Deleted successfully ',
       });
-      playDelete();
+      return playDelete();
     }
 
-    if (affirmations.length) {
-      console.log('da');
+    if (affirmations) {
       let affAfterFiltered = undefined;
       let affCurrent: string[] = [];
       affirmations.forEach((e) => {

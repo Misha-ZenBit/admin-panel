@@ -1,5 +1,12 @@
 import { notification, Input, Button, Modal, Select } from 'antd';
-import { getDocs, doc, addDoc, deleteDoc, setDoc } from 'firebase/firestore';
+import {
+  getDocs,
+  doc,
+  addDoc,
+  deleteDoc,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { affirmationRef, categoriesRef, db } from '../../Firebase';
 import { ButtonDel, Container, Page } from '../Categories/styles';
@@ -27,10 +34,15 @@ const Affirmation: React.FC = () => {
   const [visibleBtn, setVisibleBtn] = useState(false);
   const [visibleBtnBottom, setVisibleBtnBottom] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [visibleByEdit, setVisibleByEdit] = useState(false);
 
   const [keyCategory, setKeyCategory] = useState('');
   const [nameCategory, setNameCategory] = useState('');
   const [selectedKey, setSelectedKey] = useState('');
+
+  const [editAnswerValue, setEditAnswerValue] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editId, setEditId] = useState('');
 
   useEffect(() => {
     getCategories();
@@ -131,7 +143,18 @@ const Affirmation: React.FC = () => {
     setVisibleBtn(false);
   };
 
-  const onDeleteAffirmation = async (e: any) => {
+  const onDeleteAffirmation = async (e: React.MouseEvent<HTMLInputElement>) => {
+    const containInCategory = categoriesObj?.filter((cat) =>
+      cat.affirmations.includes(e.currentTarget.id)
+    );
+    const name = containInCategory?.map((e) => e.name);
+    if (containInCategory?.length) {
+      return notification.error({
+        message: 'Deletion prohibited!',
+        description: `First you need to remove from the category(ies) - "${name}"`,
+      });
+    }
+
     setVisible(true);
     setCurrentId(e.currentTarget.id);
     setCurrentDescription(e.currentTarget.value);
@@ -155,6 +178,24 @@ const Affirmation: React.FC = () => {
     await setConfirmLoading(false);
     setVisible(false);
   };
+
+  // const onEditAffirmationModal = async () => {
+  //   setConfirmLoading(true);
+
+  //   const docRef = doc(db, 'Affirmation', currentId);
+  //   await deleteDoc(docRef)
+  //     .then(() => console.log('Docuent Deleted'))
+  //     .catch((error) => console.log(error.message));
+
+  //   await getAffirmation();
+  //   notification.success({
+  //     message: '🧺 Deleted successfully ',
+  //   });
+  //   playDelete();
+
+  //   await setConfirmLoading(false);
+  //   setVisible(false);
+  // };
 
   const fetchSelectedAffirmations = async (nameCategory: string, e: any) => {
     setKeyCategory(e.key);
@@ -187,7 +228,9 @@ const Affirmation: React.FC = () => {
     playCreate();
   };
 
-  const onSeparateAffirmation = async (e: any) => {
+  const onSeparateAffirmation = async (
+    e: React.MouseEvent<HTMLInputElement>
+  ) => {
     const id = e.currentTarget.id;
     const affirmationArrayAfterDelete = affirmationsId.filter((e) => e !== id);
     const docRef = doc(db, 'Categories', keyCategory);
@@ -218,6 +261,30 @@ const Affirmation: React.FC = () => {
         {e.answer}
       </Option>
     ));
+  };
+
+  const onEditAffirmation = async (e: React.MouseEvent<HTMLInputElement>) => {
+    setVisibleByEdit(true);
+    setEditId(e.currentTarget.id);
+    setEditAnswerValue(JSON.parse(e.currentTarget.name)[0]);
+    setEditDescription(JSON.parse(e.currentTarget.name)[1]);
+  };
+
+  const onOkEditModal = async () => {
+    const docRef = doc(db, 'Affirmation', editId);
+    await updateDoc(docRef, {
+      answer: editAnswerValue,
+      description: editDescription,
+    })
+      .then(() => console.log('Docuent Updated'))
+      .catch((error) => console.log(error.message));
+    await getAffirmation();
+    notification.success({
+      message: 'Updated successfully ',
+    });
+    await setConfirmLoading(false);
+    await playCreate();
+    await setVisibleByEdit(false);
   };
 
   return (
@@ -275,10 +342,10 @@ const Affirmation: React.FC = () => {
             </Li>
             <li key={e.id} style={{ display: 'flex', alignItems: 'center' }}>
               <ButtonDel
-                // onClick={onChangeCategory}
+                onClick={onEditAffirmation}
                 id={e.id}
                 type="primary"
-                name={e.answer}
+                name={JSON.stringify([e.answer, e.description])}
                 style={{ marginBottom: 0 }}
               >
                 ✏
@@ -404,6 +471,33 @@ const Affirmation: React.FC = () => {
           <span style={{ fontWeight: '500' }}>Description</span> - "
           {currentDescription}"
         </p>
+      </Modal>
+      <Modal
+        title="Affirmation editing!"
+        visible={visibleByEdit}
+        onOk={onOkEditModal}
+        onCancel={(): void => setVisibleByEdit(false)}
+        confirmLoading={confirmLoading}
+        centered
+      >
+        <p style={{ marginBottom: 0 }}>
+          {' '}
+          <span style={{ fontWeight: '500' }}>Answer</span>
+        </p>
+        <Input
+          type="text"
+          onChange={(e) => setEditAnswerValue(e.currentTarget.value)}
+          value={editAnswerValue}
+        />
+        <p style={{ marginBottom: 5, marginTop: 10 }}>
+          {' '}
+          <span style={{ fontWeight: '500' }}>Description</span>
+        </p>
+        <Input
+          type="text"
+          onChange={(e) => setEditDescription(e.currentTarget.value)}
+          value={editDescription}
+        />
       </Modal>
     </>
   );
