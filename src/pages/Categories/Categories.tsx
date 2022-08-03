@@ -1,12 +1,20 @@
 import { Button, Input, notification, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { BoxContainer, ButtonDel, Container, Page } from './styles';
+import {
+  BoxContainer,
+  ButtonDel,
+  Circle,
+  Container,
+  GithubPickers,
+  Page,
+} from './styles';
 import { getDocs, doc, addDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { affirmationRef, categoriesRef, db } from '../../Firebase';
 import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
 import { IAff, ICat } from '../../types/types';
+import { GithubPicker } from 'react-color';
 
 const Categories: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
@@ -23,6 +31,9 @@ const Categories: React.FC = () => {
   const [currentChengeId, setCurrentChengeId] = useState('');
   const [currentChangeInput, setCurrentChangeInput] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [color, setColor] = useState(['yellow', 'lightgrey', 'purple']);
+  const [selectedColor, setSelectedColor] = useState('');
+  console.log('selectedColor', selectedColor);
 
   useEffect(() => {
     getCategories();
@@ -44,6 +55,7 @@ const Categories: React.FC = () => {
             id: e.id,
             name: e.data.name,
             affirmations: e.data.affirmations,
+            color: e.data.color,
           };
           nameOfCat.push(e.data.name);
           setNameCategory(nameOfCat);
@@ -81,8 +93,10 @@ const Categories: React.FC = () => {
   };
 
   const onAddCategory = async () => {
-    if (!curentValue) {
-      return;
+    if (!curentValue || !selectedColor) {
+      return notification.error({
+        message: `Fields "Name" and "Color" are required!`,
+      });
     }
 
     if (nameCategory.includes(curentValue)) {
@@ -90,7 +104,7 @@ const Categories: React.FC = () => {
         message: `"${curentValue}" - this category already exists`,
       });
     }
-    await addDoc(categoriesRef, { name: curentValue })
+    await addDoc(categoriesRef, { name: curentValue, color: selectedColor })
       .then((res) => console.log('res', res))
       .catch((error) => {
         console.log(error.message);
@@ -108,7 +122,6 @@ const Categories: React.FC = () => {
     setCurrentId(e.currentTarget.id);
     setCurrentName(e.currentTarget.name);
     let affirmations: string[] = [];
-    console.log('Test', categoriesObj);
 
     categoriesObj?.forEach((word) => {
       if (word.id === e.currentTarget.id) {
@@ -116,7 +129,7 @@ const Categories: React.FC = () => {
       }
     });
 
-    if (!affirmations.length) {
+    if (!affirmations || affirmations.length === 0) {
       const docRef = doc(db, 'Categories', e.currentTarget.id);
       await deleteDoc(docRef)
         .then(() => console.log('Docuent Deleted'))
@@ -165,7 +178,7 @@ const Categories: React.FC = () => {
   const handleChangeOk = async () => {
     await setConfirmLoading(true);
     const docRef = doc(db, 'Categories', currentChengeId);
-    await updateDoc(docRef, { name: currentChangeInput })
+    await updateDoc(docRef, { name: currentChangeInput, color: selectedColor })
       .then(() => console.log('Docuent Updated'))
       .catch((error) => console.log(error.message));
     await getCategories();
@@ -180,8 +193,15 @@ const Categories: React.FC = () => {
   const handleChangeCancel = () => {
     setIsChangeModalVisible(false);
   };
+
   const handleCancel = () => {
     setIsModalVisible(false);
+  };
+
+  const onchange = (e: any) => {
+    e.hex === '#ffff00' && setSelectedColor('yellow');
+    e.hex === '#d3d3d3' && setSelectedColor('grey');
+    e.hex === '#800080' && setSelectedColor('purple');
   };
 
   return (
@@ -192,11 +212,13 @@ const Categories: React.FC = () => {
           onChange={(e) => setCurentValue(e.currentTarget.value)}
           value={curentValue}
           placeholder={' New category'}
+          style={{ marginRight: 20 }}
         />
+        <GithubPickers colors={color} onChange={onchange} />
         <Button
           onClick={onAddCategory}
           type="primary"
-          style={{ marginLeft: 20 }}
+          style={{ marginLeft: 20, marginTop: 3 }}
         >
           Add
         </Button>
@@ -204,13 +226,35 @@ const Categories: React.FC = () => {
       <BoxContainer>
         {categoriesObj?.map((e) => (
           <Container key={e.id}>
-            <p style={{ fontSize: 16, fontWeight: 500 }}>{e.name}</p>
+            <div
+              style={{
+                display: 'flex',
+              }}
+            >
+              <Circle
+                style={{
+                  backgroundColor: e.color,
+                  boxShadow: `0px 0 12px 10px ${e.color}`,
+                }}
+              />
+              <p
+                style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  margin: 0,
+                  marginLeft: 15,
+                }}
+              >
+                {e.name}
+              </p>
+            </div>
             <li key={e.id} style={{ display: 'flex' }}>
               <ButtonDel
                 onClick={onChangeCategory}
                 id={e.id}
                 type="primary"
                 name={e.name}
+                style={{ marginBottom: 0 }}
               >
                 ✏
               </ButtonDel>
@@ -219,7 +263,7 @@ const Categories: React.FC = () => {
                 id={e.id}
                 type="primary"
                 name={e.name}
-                style={{ marginLeft: 10 }}
+                style={{ marginLeft: 10, marginBottom: 0, marginRight: 8 }}
               >
                 ❌
               </ButtonDel>
@@ -237,9 +281,11 @@ const Categories: React.FC = () => {
       >
         <Input
           type="text"
+          style={{ marginBottom: 10 }}
           onChange={(e) => setCurrentChangeInput(e.currentTarget.value)}
           value={currentChangeInput}
         />
+        <GithubPickers colors={color} onChange={onchange} />
       </Modal>
 
       <Modal

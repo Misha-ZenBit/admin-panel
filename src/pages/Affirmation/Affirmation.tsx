@@ -179,24 +179,6 @@ const Affirmation: React.FC = () => {
     setVisible(false);
   };
 
-  // const onEditAffirmationModal = async () => {
-  //   setConfirmLoading(true);
-
-  //   const docRef = doc(db, 'Affirmation', currentId);
-  //   await deleteDoc(docRef)
-  //     .then(() => console.log('Docuent Deleted'))
-  //     .catch((error) => console.log(error.message));
-
-  //   await getAffirmation();
-  //   notification.success({
-  //     message: '🧺 Deleted successfully ',
-  //   });
-  //   playDelete();
-
-  //   await setConfirmLoading(false);
-  //   setVisible(false);
-  // };
-
   const fetchSelectedAffirmations = async (nameCategory: string, e: any) => {
     setKeyCategory(e.key);
     setNameCategory(nameCategory);

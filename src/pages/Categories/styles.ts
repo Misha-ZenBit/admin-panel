@@ -1,13 +1,13 @@
 import { Button } from 'antd';
 import styled from 'styled-components';
 import { Checkbox } from 'antd';
+import { GithubPicker } from 'react-color';
 
 export const Page = styled.div`
   display: flex;
   margin-left: auto;
   margin-right: auto;
-  max-width: 300px;
-  /* margin-right: 50%; */
+  max-width: 460px;
 `;
 export const CheckBoxes = styled(Checkbox.Group)`
   display: inline-grid;
@@ -24,8 +24,27 @@ export const BoxContainer = styled.div`
 export const Container = styled.div`
   display: flex;
   justify-content: space-between;
+  background-color: transparent 50%;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 20px;
+  height: 38px;
+  border-radius: 25px 25px 25px 25px;
   border-bottom: 1px solid white;
-  margin-bottom: 10px;
+`;
+
+export const GithubPickers = styled(GithubPicker)`
+  max-width: min-content !important;
+  flex-wrap: nowrap !important;
+`;
+export const Circle = styled.div`
+  width: 0px;
+  height: 0px;
+  border-radius: 50% 50% 50% 50%;
+  margin-right: 10px;
+  margin-left: 25px;
+  margin-top: 12px;
 `;
 
 export const ButtonDel = styled(Button)`
