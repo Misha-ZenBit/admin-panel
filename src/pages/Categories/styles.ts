@@ -28,7 +28,6 @@ export const Container = styled.div`
   vertical-align: middle;
   align-items: center;
   text-align: center;
-  margin-bottom: 20px;
   height: 38px;
   border-radius: 25px 25px 25px 25px;
   border-bottom: 1px solid white;

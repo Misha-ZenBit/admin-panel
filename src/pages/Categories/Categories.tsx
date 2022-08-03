@@ -225,7 +225,7 @@ const Categories: React.FC = () => {
       </Page>
       <BoxContainer>
         {categoriesObj?.map((e) => (
-          <Container key={e.id}>
+          <Container key={e.id} style={{ marginBottom: 15 }}>
             <div
               style={{
                 display: 'flex',
