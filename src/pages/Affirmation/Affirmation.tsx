@@ -79,7 +79,7 @@ const Affirmation: React.FC = () => {
 
         setAffirmationsId(AffirmationsId);
         const Affirmatoins = affirmationsObj?.filter((aff) => {
-          return AffirmationsId.includes(aff.id);
+          return AffirmationsId?.includes(aff.id);
         });
 
         setFilteredAffObj(Affirmatoins);
@@ -143,10 +143,14 @@ const Affirmation: React.FC = () => {
     setVisibleBtn(false);
   };
 
-  const onDeleteAffirmation = async (e: React.MouseEvent<HTMLInputElement>) => {
-    const containInCategory = categoriesObj?.filter((cat) =>
-      cat.affirmations.includes(e.currentTarget.id)
-    );
+  const onDeleteAffirmation = (e: React.MouseEvent<HTMLInputElement>) => {
+    console.log('onDeleteAffirmation');
+    const id = e.currentTarget.id;
+    const containInCategory = categoriesObj?.filter((cat) => {
+      return cat.affirmations?.includes(id);
+    });
+    console.log('containInCategory', containInCategory);
+
     const name = containInCategory?.map((e) => e.name);
     if (containInCategory?.length) {
       return notification.error({
