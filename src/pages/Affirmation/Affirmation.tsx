@@ -347,6 +347,7 @@ const Affirmation: React.FC = () => {
         ))}
       </Box>
       <Box style={{ height: '0%', paddingTop: 18, paddingBottom: 15 }}>
+        <Title>Add Affirmations to Category</Title>
         <LiMain>
           <Select
             defaultValue="Choose category..."
@@ -412,6 +413,7 @@ const Affirmation: React.FC = () => {
         <LiMain
           style={{
             justifyContent: 'center',
+            marginTop: 10,
           }}
         >
           <Select

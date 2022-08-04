@@ -31,9 +31,10 @@ const Categories: React.FC = () => {
   const [currentChengeId, setCurrentChengeId] = useState('');
   const [currentChangeInput, setCurrentChangeInput] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [color, setColor] = useState(['yellow', 'lightgrey', 'purple']);
   const [selectedColor, setSelectedColor] = useState('');
-  console.log('selectedColor', selectedColor);
+  const [selectedColorModal, setSelectedColorModal] = useState('');
+
+  const color = ['yellow', 'lightgrey', 'purple'];
 
   useEffect(() => {
     getCategories();
@@ -110,7 +111,7 @@ const Categories: React.FC = () => {
         console.log(error.message);
       });
     await getCategories();
-
+    await setSelectedColor('');
     notification.success({
       message: `Successfully created - "${curentValue}"`,
     });
@@ -178,13 +179,17 @@ const Categories: React.FC = () => {
   const handleChangeOk = async () => {
     await setConfirmLoading(true);
     const docRef = doc(db, 'Categories', currentChengeId);
-    await updateDoc(docRef, { name: currentChangeInput, color: selectedColor })
+    await updateDoc(docRef, {
+      name: currentChangeInput,
+      color: selectedColorModal,
+    })
       .then(() => console.log('Docuent Updated'))
       .catch((error) => console.log(error.message));
     await getCategories();
     notification.success({
       message: 'Updated successfully ',
     });
+    await setSelectedColor('');
     await setConfirmLoading(false);
     await playCreate();
     await setIsChangeModalVisible(false);
@@ -204,9 +209,15 @@ const Categories: React.FC = () => {
     e.hex === '#800080' && setSelectedColor('purple');
   };
 
+  const onColorModal = (e: any) => {
+    e.hex === '#ffff00' && setSelectedColorModal('yellow');
+    e.hex === '#d3d3d3' && setSelectedColorModal('grey');
+    e.hex === '#800080' && setSelectedColorModal('purple');
+  };
+
   return (
     <>
-      <Page>
+      <Page style={{ boxShadow: `0 0 10px 3px ${selectedColor || 'none'}` }}>
         <Input
           type="text"
           onChange={(e) => setCurentValue(e.currentTarget.value)}
@@ -285,7 +296,7 @@ const Categories: React.FC = () => {
           onChange={(e) => setCurrentChangeInput(e.currentTarget.value)}
           value={currentChangeInput}
         />
-        <GithubPickers colors={color} onChange={onchange} />
+        <GithubPickers colors={color} onChange={onColorModal} />
       </Modal>
 
       <Modal

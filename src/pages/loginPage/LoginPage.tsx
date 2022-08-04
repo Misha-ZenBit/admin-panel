@@ -1,10 +1,20 @@
 import { Button, Form, Input } from 'antd';
 import 'antd/dist/antd.min.css';
-import React from 'react';
+import React, { useRef } from 'react';
+import { auth } from '../../Firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { StyledForm } from './styles';
+
 const LoginPage: React.FC = () => {
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  console.log('Test', emailRef, passwordRef);
+
+  const singUp = (e: any) => {};
+
   const onFinish = (values: any) => {
     console.log('Success:', values);
+    signInWithEmailAndPassword(auth, values.username, values.password);
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -27,7 +37,7 @@ const LoginPage: React.FC = () => {
           name="username"
           rules={[{ required: true, message: 'Please input your username!' }]}
         >
-          <Input />
+          <Input ref={emailRef} />
         </Form.Item>
 
         <Form.Item
@@ -35,7 +45,7 @@ const LoginPage: React.FC = () => {
           name="password"
           rules={[{ required: true, message: 'Please input your password!' }]}
         >
-          <Input.Password />
+          <Input.Password ref={passwordRef} />
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

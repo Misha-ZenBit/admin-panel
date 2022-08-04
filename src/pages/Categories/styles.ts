@@ -7,7 +7,12 @@ export const Page = styled.div`
   display: flex;
   margin-left: auto;
   margin-right: auto;
-  max-width: 460px;
+  border-radius: 5px 5px 5px 5px;
+  max-width: 450px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 8px;
+  padding-left: 8px;
 `;
 export const CheckBoxes = styled(Checkbox.Group)`
   display: inline-grid;
@@ -28,14 +33,14 @@ export const Container = styled.div`
   vertical-align: middle;
   align-items: center;
   text-align: center;
+
   height: 38px;
   border-radius: 25px 25px 25px 25px;
   border-bottom: 1px solid white;
 `;
 
 export const GithubPickers = styled(GithubPicker)`
-  max-width: min-content !important;
-  flex-wrap: nowrap !important;
+  width: 149px !important;
 `;
 export const Circle = styled.div`
   width: 0px;
