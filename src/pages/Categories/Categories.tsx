@@ -30,7 +30,9 @@ const Categories: React.FC = () => {
   const [usersDb, setUsersDb] = useState<User[]>();
   const [nameCategory, setNameCategory] = useState(['']);
   const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
-  const [affirmationModal, setAffirmationModal] = useState<IAff[]>();
+  const [affirmationModal, setAffirmationModal] = useState<
+    IAff[] | undefined
+  >();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isChangeModalVisible, setIsChangeModalVisible] = useState(false);
   const [currentId, setCurrentId] = useState('');
@@ -48,6 +50,28 @@ const Categories: React.FC = () => {
     getCategories();
     getAffirmation();
   }, [currentName, currentId]);
+
+  const containInUsers = async (categoryId: string) => {
+    await getDocs(usersRef).then((resposne) => {
+      const users = resposne.docs.map((doc) => ({
+        data: doc.data(),
+        id: doc.id,
+      }));
+      let userArrays: User[] = [];
+      users.forEach((e) => {
+        const newArray = {
+          id: e.id,
+          categories: e.data.categories,
+        };
+        userArrays.push(newArray);
+      });
+      const filteredByID = userArrays.filter((e) => {
+        return e.categories.includes(categoryId);
+      });
+      console.log('filteredByID', filteredByID);
+      setCointainedInUser(filteredByID.length);
+    });
+  };
 
   const getUsers = async (categoryId: string) => {
     await getDocs(usersRef)
@@ -139,6 +163,7 @@ const Categories: React.FC = () => {
         message: `Fields "Name" and "Color" are required!`,
       });
     }
+    setSelectedColor('');
 
     if (nameCategory.includes(curentValue)) {
       return notification.error({
@@ -160,10 +185,11 @@ const Categories: React.FC = () => {
   };
 
   const onDeleteCategory = async (e: any) => {
+    getAffirmation();
     setCurrentName(e.currentTarget.name);
     setCurrentId(e.currentTarget.id);
+    containInUsers(e.currentTarget.id);
 
-    // await getUsers(e.currentTarget.id);
     let affirmations: string[] = [];
 
     categoriesObj?.forEach((word) => {
@@ -172,17 +198,8 @@ const Categories: React.FC = () => {
       }
     });
 
-    if (!affirmations || affirmations.length === 0) {
-      setIsModalVisible(true);
-      const docRef = doc(db, 'Categories', e.currentTarget.id);
-      await deleteDoc(docRef)
-        .then(() => console.log('Docuent Deleted'))
-        .catch((error) => console.log(error.message));
-      await getCategories();
-      notification.success({
-        message: '🧺 Deleted successfully ',
-      });
-      return playDelete();
+    if (!affirmations || affirmations.length === 0 || cointainedInUser === 0) {
+      return setIsModalVisible(true);
     }
 
     if (affirmations) {
@@ -206,16 +223,22 @@ const Categories: React.FC = () => {
   };
 
   const handleOk = async () => {
-    const docRef = doc(db, 'Categories', currentId);
-    deleteDoc(docRef)
-      .then(() => console.log('Document Deleted'))
-      .catch((error) => console.log(error.message));
-    getCategories();
-    notification.open({
-      message: '🧺 Deleted successfully ',
-      description: `${currentName}`,
-    });
-    await playDelete();
+    try {
+      await getUsers(currentId);
+      const docRef = doc(db, 'Categories', currentId);
+      deleteDoc(docRef)
+        .then(() => console.log('Document Deleted'))
+        .catch((error) => console.log(error.message));
+      getCategories();
+      notification.open({
+        message: '🧺 Deleted successfully ',
+        description: `${currentName}`,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    playDelete();
+    setAffirmationModal([]);
     setIsModalVisible(false);
   };
 
@@ -244,6 +267,7 @@ const Categories: React.FC = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setAffirmationModal([]);
   };
 
   const onchange = (e: any) => {
@@ -260,7 +284,7 @@ const Categories: React.FC = () => {
 
   return (
     <>
-      <Page style={{ boxShadow: `0 0 10px 3px ${selectedColor || 'none'}` }}>
+      <Page style={{ boxShadow: `0 0 10px 3px ${selectedColor || 'white'}` }}>
         <Input
           type="text"
           onChange={(e) => setCurentValue(e.currentTarget.value)}
@@ -302,7 +326,7 @@ const Categories: React.FC = () => {
                 {e.name}
               </p>
             </div>
-            <li key={e.id} style={{ display: 'flex' }}>
+            <li style={{ display: 'flex' }}>
               <ButtonDel
                 onClick={onChangeCategory}
                 id={e.id}
@@ -343,13 +367,19 @@ const Categories: React.FC = () => {
       </Modal>
 
       <Modal
-        title="This category has Affirmation(s) Do you want to delete all?"
+        title="Do you want to delete all?"
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        {affirmationModal?.map((e) => (
-          <ul key={e.id} style={{ paddingLeft: 0 }}>
+        {affirmationModal?.length ? (
+          <h2>This category has {affirmationModal?.length} Affirmation(s)!</h2>
+        ) : (
+          <h2>Category has no Affirmation(s)</h2>
+        )}
+
+        <ul style={{ paddingLeft: 0 }}>
+          {affirmationModal?.map((e) => (
             <li
               key={e.id}
               style={{
@@ -367,12 +397,15 @@ const Categories: React.FC = () => {
                 <span style={{ fontWeight: '500' }}>Description</span> - "
                 {e.description}"
               </p>
-              {affirmationModal && (
-                <h1>`And is contained in ${cointainedInUser} Users!!!`</h1>
-              )}
             </li>
-          </ul>
-        ))}
+          ))}
+        </ul>
+
+        {cointainedInUser ? (
+          <h2>{cointainedInUser} users have this category!</h2>
+        ) : (
+          <h2>Users do not have this category</h2>
+        )}
       </Modal>
     </>
   );
