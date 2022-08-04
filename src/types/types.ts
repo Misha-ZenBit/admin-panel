@@ -10,3 +10,8 @@ export interface IAff {
   answer: string;
   description: string;
 }
+
+export interface Auth {
+  email: string;
+  password: string;
+}

@@ -15,7 +15,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-export const auth = getAuth(app);
-
+export const adminRef = collection(db, 'admin');
 export const categoriesRef = collection(db, 'Categories');
 export const affirmationRef = collection(db, 'Affirmation');
