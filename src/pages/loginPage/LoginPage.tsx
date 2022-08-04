@@ -39,14 +39,11 @@ const LoginPage: React.FC = () => {
   };
 
   const onFinish = (values: Auth): void => {
-    console.log('Test', values.password, values.email);
     const password = md5(values.password);
-
     if (
       password === adminFromBd?.password &&
       values.email === adminFromBd?.email
     ) {
-      console.log('Da', password, adminFromBd?.password);
       localStorage.setItem('isLogin', 'true');
       navigate(`/categories`);
       setTimeout(() => {

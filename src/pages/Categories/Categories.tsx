@@ -8,18 +8,26 @@ import {
   GithubPickers,
   Page,
 } from './styles';
-import { getDocs, doc, addDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { affirmationRef, categoriesRef, db } from '../../Firebase';
+import {
+  getDocs,
+  doc,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  arrayRemove,
+} from 'firebase/firestore';
+import { affirmationRef, categoriesRef, db, usersRef } from '../../Firebase';
 import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
-import { IAff, ICat } from '../../types/types';
+import { IAff, ICat, User } from '../../types/types';
 
 const Categories: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
   const [playDelete] = useSound(deleteSound, { volume: 0.15 });
   const [curentValue, setCurentValue] = useState('');
   const [categoriesObj, setCategoriesObj] = useState<ICat[]>();
+  const [usersDb, setUsersDb] = useState<User[]>();
   const [nameCategory, setNameCategory] = useState(['']);
   const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
   const [affirmationModal, setAffirmationModal] = useState<IAff[]>();
@@ -32,6 +40,7 @@ const Categories: React.FC = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedColorModal, setSelectedColorModal] = useState('');
+  const [cointainedInUser, setCointainedInUser] = useState<number>();
 
   const color = ['yellow', 'lightgrey', 'purple'];
 
@@ -40,6 +49,38 @@ const Categories: React.FC = () => {
     getAffirmation();
   }, [currentName, currentId]);
 
+  const getUsers = async (categoryId: string) => {
+    await getDocs(usersRef)
+      .then((resposne) => {
+        const users = resposne.docs.map((doc) => ({
+          data: doc.data(),
+          id: doc.id,
+        }));
+        let userArrays: User[] = [];
+        users.forEach((e) => {
+          const newArray = {
+            id: e.id,
+            categories: e.data.categories,
+          };
+          userArrays.push(newArray);
+        });
+        const filteredByID = userArrays.filter((e) => {
+          return e.categories.includes(categoryId);
+        });
+        console.log('filteredByID', filteredByID);
+        setCointainedInUser(filteredByID.length);
+
+        filteredByID.forEach(async (e) => {
+          const userRef = doc(db, 'User', e.id);
+          await updateDoc(userRef, {
+            categories: arrayRemove(categoryId),
+          });
+        });
+      })
+      .catch((error) =>
+        notification.error({ message: error.message as string })
+      );
+  };
   const getCategories = async () => {
     await getDocs(categoriesRef)
       .then((resposne) => {
@@ -119,8 +160,10 @@ const Categories: React.FC = () => {
   };
 
   const onDeleteCategory = async (e: any) => {
-    setCurrentId(e.currentTarget.id);
     setCurrentName(e.currentTarget.name);
+    setCurrentId(e.currentTarget.id);
+
+    // await getUsers(e.currentTarget.id);
     let affirmations: string[] = [];
 
     categoriesObj?.forEach((word) => {
@@ -130,6 +173,7 @@ const Categories: React.FC = () => {
     });
 
     if (!affirmations || affirmations.length === 0) {
+      setIsModalVisible(true);
       const docRef = doc(db, 'Categories', e.currentTarget.id);
       await deleteDoc(docRef)
         .then(() => console.log('Docuent Deleted'))
@@ -299,7 +343,7 @@ const Categories: React.FC = () => {
       </Modal>
 
       <Modal
-        title="This category has Affirmation(s)! Do you want to delete all?"
+        title="This category has Affirmation(s) Do you want to delete all?"
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -323,6 +367,9 @@ const Categories: React.FC = () => {
                 <span style={{ fontWeight: '500' }}>Description</span> - "
                 {e.description}"
               </p>
+              {affirmationModal && (
+                <h1>`And is contained in ${cointainedInUser} Users!!!`</h1>
+              )}
             </li>
           </ul>
         ))}

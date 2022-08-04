@@ -6,9 +6,12 @@ import Affirmation from './pages/Affirmation/Affirmation';
 import Categories from './pages/Categories/Categories';
 import LoginPage from './pages/loginPage/LoginPage';
 import { Button, Layout, Menu } from 'antd';
+import deleteSound from './assets/delete.mp3';
+import useSound from 'use-sound';
 const { Header, Content, Footer } = Layout;
 
 const App: React.FC = () => {
+  const [playDelete] = useSound(deleteSound, { volume: 0.15 });
   const isLogin = localStorage.getItem('isLogin') ? true : false;
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +19,7 @@ const App: React.FC = () => {
   const onLogOut = async (e: React.MouseEvent<HTMLInputElement>) => {
     localStorage.clear();
     navigate('/');
-    // await window.location.reload();
+    playDelete();
   };
 
   return (
@@ -67,8 +70,12 @@ const App: React.FC = () => {
           >
             <Routes>
               <Route path="/" element={<LoginPage />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/affirmation" element={<Affirmation />} />
+              {isLogin && (
+                <>
+                  <Route path="/categories" element={<Categories />} />
+                  <Route path="/affirmation" element={<Affirmation />} />
+                </>
+              )}
             </Routes>
           </div>
         </Content>

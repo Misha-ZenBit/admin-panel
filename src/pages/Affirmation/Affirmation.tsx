@@ -148,17 +148,17 @@ const Affirmation: React.FC = () => {
       cat.affirmations.includes(e.currentTarget.id)
     );
     const name = containInCategory?.map((e) => e.name);
-    if (containInCategory?.length) {
+    if (!containInCategory || containInCategory.length !== 0) {
       return notification.error({
         message: 'Deletion prohibited!',
         description: `First you need to remove from the category(ies) - "${name}"`,
       });
     }
 
-    setVisible(true);
     setCurrentId(e.currentTarget.id);
     setCurrentDescription(e.currentTarget.value);
     setCurrentAnswer(e.currentTarget.name);
+    await setVisible(true);
   };
 
   const onDeleteAffirmationModal = async () => {
