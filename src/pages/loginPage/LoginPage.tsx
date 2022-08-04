@@ -6,10 +6,13 @@ import { adminRef, affirmationRef, categoriesRef, db } from '../../Firebase';
 import { StyledForm } from './styles';
 import md5 from 'md5';
 import { Auth } from '../../types/types';
+import { useNavigate } from 'react-router-dom';
+import createSound from '../../assets/create.mp3';
+import useSound from 'use-sound';
 
 const LoginPage: React.FC = () => {
-  const email = 'admin@urenough.com';
-  const password = 'ur-enough';
+  const navigate = useNavigate();
+  const [playCreate] = useSound(createSound, { volume: 0.1 });
   const [adminFromBd, setAdminFromBd] = useState<Auth>();
 
   useEffect(() => {
@@ -44,6 +47,14 @@ const LoginPage: React.FC = () => {
       values.email === adminFromBd?.email
     ) {
       console.log('Da', password, adminFromBd?.password);
+      localStorage.setItem('isLogin', 'true');
+      navigate(`/categories`);
+      setTimeout(() => {
+        notification.success({
+          message: 'Successfully logged!',
+        });
+        playCreate();
+      }, 250);
     } else {
       notification.error({
         message: 'Wrong email or password!',

@@ -1,15 +1,23 @@
-import React from 'react';
-import { Routes, Route, NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import './App.css';
 import { useLocation } from 'react-router-dom';
 import Affirmation from './pages/Affirmation/Affirmation';
 import Categories from './pages/Categories/Categories';
 import LoginPage from './pages/loginPage/LoginPage';
-import { Layout, Menu } from 'antd';
+import { Button, Layout, Menu } from 'antd';
 const { Header, Content, Footer } = Layout;
 
 const App: React.FC = () => {
+  const isLogin = localStorage.getItem('isLogin') ? true : false;
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const onLogOut = async (e: React.MouseEvent<HTMLInputElement>) => {
+    localStorage.clear();
+    navigate('/');
+    // await window.location.reload();
+  };
 
   return (
     <>
@@ -21,19 +29,33 @@ const App: React.FC = () => {
             mode="horizontal"
             defaultSelectedKeys={[`${location.pathname}`]}
           >
-            <Menu.Item key={'/'}>
-              LOGIN
-              <NavLink to="/" className="navLink"></NavLink>
-            </Menu.Item>
-            <Menu.Item key={'/categories'}>
-              CATEGORIES
-              <NavLink to="/categories" className="navLink"></NavLink>
-            </Menu.Item>
-            <Menu.Item key={'/affirmation'}>
-              AFFIRMATION
-              <NavLink to="/affirmation" className="navLink"></NavLink>
-            </Menu.Item>
+            {!isLogin ? (
+              <Menu.Item key={'/'}>
+                LOGIN
+                <NavLink to="/" className="navLink"></NavLink>
+              </Menu.Item>
+            ) : (
+              <>
+                <Menu.Item key={'/categories'}>
+                  CATEGORIES
+                  <NavLink to="/categories" className="navLink"></NavLink>
+                </Menu.Item>
+                <Menu.Item key={'/affirmation'}>
+                  AFFIRMATION
+                  <NavLink to="/affirmation" className="navLink"></NavLink>
+                </Menu.Item>
+              </>
+            )}
           </Menu>
+          {isLogin && (
+            <Button
+              onClick={onLogOut}
+              style={{ position: 'absolute', right: 22, top: 15 }}
+              type="primary"
+            >
+              LogOut
+            </Button>
+          )}
         </Header>
         <Content
           className="site-layout"

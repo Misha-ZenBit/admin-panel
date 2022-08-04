@@ -14,7 +14,6 @@ import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
 import { IAff, ICat } from '../../types/types';
-import { GithubPicker } from 'react-color';
 
 const Categories: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
