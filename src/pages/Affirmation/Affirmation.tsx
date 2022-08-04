@@ -147,6 +147,7 @@ const Affirmation: React.FC = () => {
     const containInCategory = categoriesObj?.filter((cat) =>
       cat.affirmations?.includes(e.currentTarget.id)
     );
+
     const name = containInCategory?.map((e) => e.name);
     if (!containInCategory || containInCategory.length !== 0) {
       return notification.error({
