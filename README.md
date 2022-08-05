@@ -1,4 +1,6 @@
-# Welcome to the administration panel for the "ur-enough"
+## Administration panel for the "ur-enough"
+
+**To enter the administrative panel you need to enter the `e-mail` and `password` given to you personally and press `submit`**
 
 ![](public/img/login.JPG)
 
