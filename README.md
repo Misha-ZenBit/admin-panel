@@ -10,6 +10,8 @@
 
 **On the affirmations page You have the ability to `create`, `delete` or `edit` affirmations, as well as `attach` / `detach` them in the selected category**
 
+![](public/img/affirmations.JPG)
+
 ## Available Scripts
 
 In the project directory, you can run:
