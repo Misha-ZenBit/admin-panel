@@ -5,6 +5,7 @@
 ![](public/img/login.JPG)
 
 **Then you will be taken to the category page, where you will have the opportunity to `add` `delete` or `edit` categories**
+When creating a category, you need to enter the name of the category and select a color, then click the `Add` button
 
 ![](public/img/categories.JPG)
 
