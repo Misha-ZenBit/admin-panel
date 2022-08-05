@@ -246,7 +246,7 @@ const Categories: React.FC = () => {
     const docRef = doc(db, 'Categories', currentChengeId);
     await updateDoc(docRef, {
       name: currentChangeInput,
-      color: selectedColorModal,
+      color: selectedColorModal || undefined,
     })
       .then(() => console.log('Docuent Updated'))
       .catch((error) => console.log(error.message));
