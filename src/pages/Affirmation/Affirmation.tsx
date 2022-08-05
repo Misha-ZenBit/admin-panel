@@ -47,7 +47,7 @@ const Affirmation: React.FC = () => {
   useEffect(() => {
     getCategories();
     getAffirmation();
-  }, []);
+  }, [keyCategory, nameCategory]);
 
   const getCategories = async () => {
     await getDocs(categoriesRef)
@@ -194,7 +194,7 @@ const Affirmation: React.FC = () => {
     setVisibleBtnBottom(true);
 
     const docRef = doc(db, 'Categories', keyCategory);
-    await setDoc(docRef, {
+    await updateDoc(docRef, {
       affirmations: [...affirmationsId, selectedKey],
       name: nameCategory,
     })
@@ -410,7 +410,6 @@ const Affirmation: React.FC = () => {
             </li>
           </Container>
         ))}
-
         <LiMain
           style={{
             justifyContent: 'center',
