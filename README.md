@@ -1,6 +1,6 @@
 # Welcome to the administration panel for the "ur-enough"
 
-![](public/img/login.jpg)
+![](public/img/login.JPG)
 
 ## Available Scripts
 
