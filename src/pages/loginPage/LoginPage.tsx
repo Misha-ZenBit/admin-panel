@@ -1,11 +1,11 @@
 import { Button, Form, Input, notification } from 'antd';
 import 'antd/dist/antd.min.css';
-import React, { useEffect, useRef, useState } from 'react';
-import { getDocs, doc, addDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { adminRef, affirmationRef, categoriesRef, db } from '../../Firebase';
+import React, { useEffect, useState } from 'react';
+import { getDocs } from 'firebase/firestore';
+import { adminRef } from '../../Firebase';
 import { StyledForm } from './styles';
 import md5 from 'md5';
-import { Auth } from '../../types/types';
+import { Auth } from 'types/types';
 import { useNavigate } from 'react-router-dom';
 import createSound from '../../assets/create.mp3';
 import useSound from 'use-sound';

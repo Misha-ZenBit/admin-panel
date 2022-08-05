@@ -14,7 +14,7 @@ import { Box, Div, Empty, Li, LiMain, P, Title, Vertical } from './styles';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
 import useSound from 'use-sound';
-import { IAff, ICat } from '../../types/types';
+import { IAff, ICat } from 'types/types';
 const { Option } = Select;
 const Affirmation: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
@@ -47,7 +47,7 @@ const Affirmation: React.FC = () => {
   useEffect(() => {
     getCategories();
     getAffirmation();
-  }, [keyCategory, nameCategory]);
+  }, []);
 
   const getCategories = async () => {
     await getDocs(categoriesRef)

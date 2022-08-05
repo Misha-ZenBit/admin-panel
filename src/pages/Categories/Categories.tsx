@@ -20,14 +20,13 @@ import { affirmationRef, categoriesRef, db, usersRef } from '../../Firebase';
 import useSound from 'use-sound';
 import deleteSound from '../../assets/delete.mp3';
 import createSound from '../../assets/create.mp3';
-import { IAff, ICat, User } from '../../types/types';
+import { IAff, ICat, User } from 'types/types';
 
 const Categories: React.FC = () => {
   const [playCreate] = useSound(createSound, { volume: 0.1 });
   const [playDelete] = useSound(deleteSound, { volume: 0.15 });
   const [curentValue, setCurentValue] = useState('');
   const [categoriesObj, setCategoriesObj] = useState<ICat[]>();
-  const [usersDb, setUsersDb] = useState<User[]>();
   const [nameCategory, setNameCategory] = useState(['']);
   const [affirmationsObj, setAffirmationsObj] = useState<IAff[]>();
   const [affirmationModal, setAffirmationModal] = useState<
