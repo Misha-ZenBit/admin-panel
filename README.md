@@ -4,6 +4,8 @@
 
 ![](public/img/login.JPG)
 
+Then you will be taken to the category page, where you will have the opportunity to `add` `delete` or `edit` categories
+
 ## Available Scripts
 
 In the project directory, you can run:
