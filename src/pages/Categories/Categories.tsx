@@ -42,6 +42,7 @@ const Categories: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedColorModal, setSelectedColorModal] = useState('');
   const [cointainedInUser, setCointainedInUser] = useState<number>();
+  const [currentColor, setCurrentColor] = useState<number>();
 
   const color = ['yellow', 'lightgrey', 'purple'];
 
@@ -216,8 +217,10 @@ const Categories: React.FC = () => {
   };
 
   const onChangeCategory = async (e: any) => {
+    const json = JSON.parse(e.currentTarget.name);
     setCurrentChengeId(e.currentTarget.id);
-    setCurrentChangeInput(e.currentTarget.name);
+    setCurrentChangeInput(json[0]);
+    setCurrentColor(json[1]);
     setIsChangeModalVisible(true);
   };
 
@@ -242,11 +245,11 @@ const Categories: React.FC = () => {
   };
 
   const handleChangeOk = async () => {
-    await setConfirmLoading(true);
     const docRef = doc(db, 'Categories', currentChengeId);
+    await setConfirmLoading(true);
     await updateDoc(docRef, {
       name: currentChangeInput,
-      color: selectedColorModal || undefined,
+      color: selectedColorModal || currentColor,
     })
       .then(() => console.log('Docuent Updated'))
       .catch((error) => console.log(error.message));
@@ -330,7 +333,7 @@ const Categories: React.FC = () => {
                 onClick={onChangeCategory}
                 id={e.id}
                 type="primary"
-                name={e.name}
+                name={JSON.stringify([e.name, e.color])}
                 style={{ marginBottom: 0 }}
               >
                 ✏
@@ -360,6 +363,7 @@ const Categories: React.FC = () => {
           type="text"
           style={{ marginBottom: 10 }}
           onChange={(e) => setCurrentChangeInput(e.currentTarget.value)}
+          // defaultValue={currentChangeInput}
           value={currentChangeInput}
         />
         <GithubPickers colors={color} onChange={onColorModal} />
