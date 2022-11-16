@@ -22,12 +22,9 @@ const LoginPage: React.FC = () => {
   const getAdmin = async () => {
     await getDocs(adminRef)
       .then((resposne) => {
-        console.log('resposne ', resposne);
-
         const admin = resposne.docs.map((doc) => ({
           data: doc.data(),
         }));
-        console.log('admin', admin);
 
         admin.forEach((e) => {
           const newArray = {
@@ -44,8 +41,6 @@ const LoginPage: React.FC = () => {
 
   const onFinish = (values: Auth): void => {
     const password = md5(values.password);
-    console.log(password);
-    console.log(adminFromBd?.password);
 
     if (
       password === adminFromBd?.password &&
